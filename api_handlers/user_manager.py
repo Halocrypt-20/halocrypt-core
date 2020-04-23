@@ -172,3 +172,5 @@ def handler(data: ParsedRequest):
         return send_verification_email(data.json)
     if action == "check-email-token":
         return check_email_token(data.json)
+    if action == "check-auth":
+        return {"is_logged_in": is_logged_in()}
