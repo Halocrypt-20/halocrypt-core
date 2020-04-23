@@ -1,0 +1,61 @@
+from flask import Flask, request, send_from_directory
+
+from app_init import app, json_response, ParsedRequest, clear_data, get_session
+from api_handlers import get_handler
+from util import get_client_ip
+
+# Favicon
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory("static", "favicon.ico")
+
+
+# setup redirect to frontend?
+@app.route("/")
+def index():
+    return json_response({"hello": "world"})
+
+
+@app.route("/_/ip")
+def ip_addr():
+    return json_response(
+        {
+            "inferred_ip": get_client_ip(request.headers, request.remote_addr),
+            "remote_addr": request.remote_addr,
+            "x-fwd": request.headers.get("x-forwarded-for"),
+        }
+    )
+
+
+@app.route("/api/logout/", strict_slashes=False)
+def handle_logout():
+    return clear_data()
+
+
+kwargs = dict(strict_slashes=False, methods=["post", "get"])
+
+
+@app.route("/<route>/", **kwargs)
+@app.route("/<route>/<action>/", **kwargs)
+@app.route("/api/<route>/", **kwargs)
+@app.route("/api/<route>/<action>/", **kwargs)
+def handle_api_call(route, action=None):
+    # get one of the user/play/admin handlers
+    handler = get_handler(route)
+    if not handler:
+        return json_response(
+            {"error": f"no handler for api '{route[:50]}'"}, status=404
+        )
+    # parse request
+    parsed_request = ParsedRequest(request, action)
+    data = handler(parsed_request)
+    kwargs = {}
+    # if our handler returned a tuple, the second element is kwargs object
+    if isinstance(data, tuple):
+        kwargs = data[1]
+        data = data[0]
+    return json_response({"data": data}, **kwargs)
+
+
+if __name__ == "__main__":
+    app.run(debug=True, use_reloader=True)
