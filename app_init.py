@@ -1,7 +1,7 @@
 from enum import Enum
 from json import dumps, loads
 from os import environ
-from secrets import token_urlsafe
+from secrets import token_hex
 
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, Response, request, session, redirect
@@ -17,7 +17,7 @@ from rate_limit_manager import check_rate_limit
 setup_env()
 
 app = Flask(__name__)
-app.secret_key = environ.get("secret-key", token_urlsafe(10))
+app.secret_key = environ.get("secret-key", token_hex(10))
 
 cookie_sess = SecureCookieSessionInterface()
 _cookie_serializer = cookie_sess.get_signing_serializer(app)
@@ -217,7 +217,7 @@ class EphermalTokenStore(db.Model):
         self.token_generated_at = js_time()
         self.token_user = token_for
         self.token_type = token_type
-        self.token_string = token_urlsafe(25)  # sounds good?
+        self.token_string = token_hex(8)  # sounds good?
 
     @property
     def is_expired(self) -> bool:
