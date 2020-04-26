@@ -219,6 +219,7 @@ class EphermalTokenStore(db.Model):
         self.token_type = token_type
         self.token_string = token_urlsafe(25)  # sounds good?
 
+    @property
     def is_expired(self) -> bool:
         return (js_time() - self.token_generated_at) > THREE_HOURS_JS_TIME
 

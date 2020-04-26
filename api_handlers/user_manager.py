@@ -75,7 +75,7 @@ def add_user(data: dict):
 
 def is_invalid_data(data: dict):
     reasons = []
-    required_attrs = ["name", "user", "email", "password", "school"]
+    required_attrs = ["name", "user", "email", "password"]
     for i in required_attrs:
         if not i in data:
             reasons.append(i)
@@ -117,7 +117,7 @@ def forgot_password(js: dict) -> dict:
     send_email_to_user(
         utable.email,
         "Reset Password - Halocrypt",
-        f"Your one time password reset token is - {new_token}",
+        f"Your one time password reset token is - {new_token.token_string}",
     )
     return {"success": "Email Sent"}
 
@@ -126,6 +126,8 @@ def check_password_token(js: dict) -> dict:
     get = js.get
     token = get("token")
     new_password = get("new_password")
+    if len(new_password) < 5:
+        return {"error": "Password too short"}
     store = get_token_store_by_token(token)
     if store:
         if store.is_expired:
@@ -148,7 +150,7 @@ def send_verification_email(js: dict) -> dict:
     send_email_to_user(
         get_user_by_id(user).email,
         "Verify Email address - Halocrypt",
-        f"Your Verification Code is - {new_token}",
+        f"Your Verification Code is - {new_token.token_string}",
     )
     return {"success": "Email Sent"}
 
