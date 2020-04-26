@@ -54,6 +54,11 @@ def add_user(data: dict):
     if len(user) < 3 or len(user) > 30:
         return {"error": "Could not create account", "reason": "username length"}
     password = data.pop("password")
+    if len(password) < 5:
+        return {
+            "errpr": "Could not create account",
+            "reason": "password length too short",
+        }
     pw_hash = generate_password_hash(password)
     data["password_hash"] = pw_hash
     data["user"] = user
@@ -109,7 +114,11 @@ def forgot_password(js: dict) -> dict:
     if not utable:
         return {"error": "User does not exist"}
     add_to_db(new_token)
-    send_email_to_user({"password_token": new_token}, utable.email)
+    send_email_to_user(
+        utable.email,
+        "Reset Password - Halocrypt",
+        f"Your one time password reset token is - {new_token}",
+    )
     return {"success": "Email Sent"}
 
 
@@ -136,7 +145,12 @@ def send_verification_email(js: dict) -> dict:
     user = js.get("user")
     new_token = EphermalTokenStore("email_verify", user)
     add_to_db(new_token)
-    send_email_to_user({"email_verification": new_token}, get_user_by_id(user).email)
+    send_email_to_user(
+        get_user_by_id(user).email,
+        "Verify Email address - Halocrypt",
+        f"Your Verification Code is - {new_token}",
+    )
+    return {"success": "Email Sent"}
 
 
 def check_email_token(js: dict) -> dict:
@@ -173,4 +187,8 @@ def handler(data: ParsedRequest):
     if action == "check-email-token":
         return check_email_token(data.json)
     if action == "check-auth":
-        return {"is_logged_in": is_logged_in()}
+        logged_in = is_logged_in()
+        user_details = None
+        if logged_in:
+            user_details = get_user_by_id(get_current_user()).as_json
+        return {"is_logged_in": bool(logged_in), "user_data": user_details}

@@ -129,7 +129,7 @@ def handler(data: ParsedRequest) -> dict:
     if action == "edit-question":
         return edit_question(data.json)
 
-    user = get_user_by_id(data.json.get("user_id"))
+    user = get_user_by_id(data.json.get("user"))
     if action == "set-level":
         return set_level(user, data.json.get("level"))
     if action == "delete-user":

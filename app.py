@@ -27,7 +27,7 @@ def ip_addr():
     )
 
 
-@app.route("/api/logout/", strict_slashes=False)
+@app.route("/api/logout/", strict_slashes=False, methods=["post"])
 def handle_logout():
     return clear_data()
 
