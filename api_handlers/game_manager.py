@@ -22,8 +22,9 @@ def clean_node(a):
 
 
 def generate_leaderboard():
-    all_users: List[UserTable] = query_all(UserTable)
-    all_users.sort(reverse=True)
+    all_users: List[UserTable] = UserTable.query.order_by(
+        UserTable.current_level.desc(), UserTable.last_question_answered_at.asc()
+    ).all()
     return map_to_list(clean_node, all_users)
 
 
