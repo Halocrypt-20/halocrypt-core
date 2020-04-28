@@ -11,7 +11,14 @@ from flask.sessions import SecureCookieSessionInterface
 
 from constants import IS_LOGGED_IN, USER_ID, THREE_HOURS_JS_TIME
 from set_env import setup_env
-from util import validate_email_address, is_prod, get_host, sanitize, js_time
+from util import (
+    validate_email_address,
+    is_prod,
+    get_host,
+    sanitize,
+    js_time,
+    get_client_ip,
+)
 from rate_limit_manager import check_rate_limit
 
 setup_env()
@@ -56,7 +63,7 @@ def is_logged_in() -> bool:
 # get current user from session
 def get_current_user():
     sess = get_session(request)
-    return sess.get(IS_LOGGED_IN) and sess.get(USER_ID)
+    return (sess.get(IS_LOGGED_IN) and sess.get(USER_ID)) or None
 
 
 # json response helper
@@ -279,10 +286,16 @@ class Logs(db.Model):
     ip_addr = db.Column(db.String)
     action_user = db.Column(db.String)
     action_id = db.Column(db.Integer, primary_key=True)
+    _js_dict = db.Column(db.String)
     # pylint: enable=E1101
 
     def __init__(
-        self, action_type: str, action_user: str, ip_addr: str, action_timestamp: int
+        self,
+        action_type: str,
+        action_user: str,
+        ip_addr: str,
+        action_timestamp: int,
+        js_dict: dict,
     ):
         if not action_type:
             raise Exception("Invalid data")
@@ -291,6 +304,7 @@ class Logs(db.Model):
         self.action_timestamp = action_timestamp or js_time()
         self.ip_addr = ip_addr
         self.action_user = action_user
+        self._js_dict = dumps(js_dict)
 
     @property
     def as_json(self):
@@ -300,6 +314,7 @@ class Logs(db.Model):
             "action_timestamp": self.action_timestamp,
             "ip_addr": self.ip_addr,
             "action_user": self.action_user,
+            "js_dict": loads(self._js_dict),
         }
 
 
@@ -310,6 +325,7 @@ class ParsedRequest:
         self.headers = request.headers
         self.json: dict = request.get_json()
         self.action = action or ""
+        self.client_ip = get_client_ip(request.headers, request.remote_addr)
 
     @property
     def as_json(self):
@@ -318,4 +334,5 @@ class ParsedRequest:
             "headers": dict(self.headers),
             "json": self.json,
             "action": self.action,
+            "client_ip": self.client_ip,
         }
