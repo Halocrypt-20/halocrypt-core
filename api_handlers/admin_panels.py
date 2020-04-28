@@ -31,6 +31,10 @@ def get_all_users():
     return map_to_list(lambda x: x.as_json, query_all(UserTable))
 
 
+def get_all_questions():
+    return map_to_list(lambda x: x.as_json, query_all(Questions))
+
+
 def is_not_admin(idx: str) -> bool:
     return not get_user_by_id(idx).is_admin
 
@@ -122,10 +126,13 @@ def handler(data: ParsedRequest) -> dict:
         )
     if action == "get-users":
         return get_all_users()
+    if action == "get-questions":
+        return get_all_questions()
     if action == "add-question":
         return add_question(data.json)
     if action == "get-latest-question-number":
-        return {"question_number": get_next_q_level()}
+        q = get_next_q_level()
+        return {"question_number": q, "question_data": get_ques_by_id(q).as_json}
     if action == "edit-question":
         return edit_question(data.json)
 

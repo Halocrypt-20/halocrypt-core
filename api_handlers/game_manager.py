@@ -8,6 +8,8 @@ from database import query_all, save_to_db
 from util import map_to_list, safe_int, sanitize, js_time
 from .common import get_ques_by_id, get_user_by_id
 
+replace = _compile(r"\s").sub
+
 no_question = lambda idx: {"game_over": True}
 # (
 #     #     {"error": f"No Questions Available for id - {idx}"},
@@ -49,8 +51,8 @@ def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
     question: Questions = get_ques_by_id(question_number)
     if not question:
         return no_question(question_number)
-    correct = sanitize(question.answer)
-    current = sanitize(answer)
+    correct = replace("", question.answer)
+    current = replace("", answer)
     if correct == current:
         user.current_level = user.current_level + 1  # +=1 yeah
         user.last_question_answered_at = js_time()
