@@ -18,10 +18,15 @@ from json import dumps
 
 ADMIN_TOKEN_OS = environ.get("ADMIN_TOKEN")
 # pylint: disable=E1101
-def get_next_q_level() -> int:
-    t = func.max(Questions.question_level)
+def get_latest_q_level() -> int:
+    func.max(Questions.question_level)
     curr = db.session.query(t).first()[0]
-    return curr + 1 if curr is not None else 0
+    return curr
+
+
+def get_next_q_level() -> int:
+    t = get_latest_q_level()
+    return t + 1 if t is not None else 0
 
 
 # pylint: enable=E1101
@@ -131,7 +136,7 @@ def handler(data: ParsedRequest) -> dict:
     if action == "add-question":
         return add_question(data.json)
     if action == "get-latest-question-number":
-        q = get_next_q_level()
+        q = get_latest_q_level()
         return {"question_number": q, "question_data": get_ques_by_id(q).as_json}
     if action == "edit-question":
         return edit_question(data.json)
