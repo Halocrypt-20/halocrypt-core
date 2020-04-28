@@ -19,7 +19,7 @@ from json import dumps
 ADMIN_TOKEN_OS = environ.get("ADMIN_TOKEN")
 # pylint: disable=E1101
 def get_latest_q_level() -> int:
-    func.max(Questions.question_level)
+    t = func.max(Questions.question_level)
     curr = db.session.query(t).first()[0]
     return curr
 
