@@ -326,6 +326,7 @@ class ParsedRequest:
         self.json: dict = request.get_json()
         self.action = action or ""
         self.client_ip = get_client_ip(request.headers, request.remote_addr)
+        self.method = request.method
 
     @property
     def as_json(self):
@@ -335,4 +336,5 @@ class ParsedRequest:
             "json": self.json,
             "action": self.action,
             "client_ip": self.client_ip,
+            "method": self.method,
         }

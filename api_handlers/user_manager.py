@@ -1,17 +1,25 @@
-from app_init import (
-    UserTable,
-    ParsedRequest,
-    is_logged_in,
-    get_current_user,
-    EphermalTokenStore,
-)
-from database import add_to_db, delete_from_db
-from constants import BAD_REQUEST, NOT_FOUND, DENIED, IS_LOGGED_IN, USER_ID
-from util import validate_email_address, sanitize
+from json import dumps
+from os import environ
+from urllib.request import Request, urlopen
+
 import passlib.hash as pwhash
-from .common import get_user_by_id, get_token_store_by_token
 from psycopg2 import IntegrityError
+
+from app_init import (
+    EphermalTokenStore,
+    ParsedRequest,
+    UserTable,
+    get_current_user,
+    is_logged_in,
+)
+from constants import BAD_REQUEST, DENIED, IS_LOGGED_IN, NOT_FOUND, USER_ID
+from database import add_to_db, delete_from_db
+from util import sanitize, validate_email_address
+
+from .common import get_token_store_by_token, get_user_by_id
 from .email_manager import send_email_to_user
+
+webhook_url = environ.get("DISCORD_WEBHOOK_URL")
 
 
 def check_password_hash(_hash, pw):
@@ -65,6 +73,7 @@ def add_user(data: dict):
     try:
         user = UserTable(**data)
         add_to_db(user)
+        webhook(user)
         return user.as_json
     except Exception as e:
         if isinstance(getattr(e, "orig", 0), IntegrityError):
@@ -168,6 +177,16 @@ def check_email_token(js: dict) -> dict:
         delete_from_db(store)
         return {"success": "Email Verified"}
     return {"error": "Invalid Token"}
+
+
+def webhook(data: UserTable):
+    js = f"{data.user} ({data.name}) just registered"
+    req = Request(
+        webhook_url,
+        data=dumps({"content": js}),
+        headers={"content-type": "application/json"},
+    )
+    urlopen(req)
 
 
 def handler(data: ParsedRequest):
