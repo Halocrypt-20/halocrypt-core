@@ -1,6 +1,6 @@
 from json import dumps
 from os import environ
-from urllib.request import Request, urlopen
+import requests
 
 import passlib.hash as pwhash
 from psycopg2 import IntegrityError
@@ -181,12 +181,7 @@ def check_email_token(js: dict) -> dict:
 
 def webhook(data: UserTable):
     js = f"{data.user} ({data.name}) just registered"
-    req = Request(
-        webhook_url,
-        data=dumps({"content": js}),
-        headers={"content-type": "application/json"},
-    )
-    urlopen(req)
+    requests.post(webhook_url, json={"content": js})
 
 
 def handler(data: ParsedRequest):
