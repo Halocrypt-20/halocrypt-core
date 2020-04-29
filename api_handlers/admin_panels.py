@@ -32,12 +32,18 @@ def get_next_q_level() -> int:
 # pylint: enable=E1101
 
 
+def get_question_data(x: Questions):
+    js = x.as_json
+    js["answer"] = x.answer
+    return js
+
+
 def get_all_users():
     return map_to_list(lambda x: x.as_json, query_all(UserTable))
 
 
 def get_all_questions():
-    return map_to_list(lambda x: x.as_json, query_all(Questions))
+    return map_to_list(get_question_data, query_all(Questions))
 
 
 def is_not_admin(idx: str) -> bool:
