@@ -25,7 +25,9 @@ def clean_node(a):
 
 def generate_leaderboard():
     all_users: List[UserTable] = UserTable.query.order_by(
-        UserTable.current_level.desc(), UserTable.last_question_answered_at.asc()
+        UserTable.is_admin.asc(),
+        UserTable.current_level.desc(),
+        UserTable.last_question_answered_at.asc(),
     ).all()
     return map_to_list(clean_node, all_users)
 
@@ -53,7 +55,7 @@ def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
         return no_question(question_number)
     correct = replace("", question.answer)
     current = replace("", answer)
-    if correct == current:
+    if correct == current:  # no
         user.current_level = user.current_level + 1  # +=1 yeah
         user.last_question_answered_at = js_time()
         save_to_db()
