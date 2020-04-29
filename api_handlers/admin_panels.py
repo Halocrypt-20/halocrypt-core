@@ -29,6 +29,16 @@ def get_next_q_level() -> int:
     return t + 1 if t is not None else 0
 
 
+def get_all_questions():
+    return map_to_list(
+        get_question_data, Questions.query.order_by(Questions.question_level).all()
+    )
+
+
+def get_all_users():
+    return map_to_list(lambda x: x.as_json, query_all(UserTable))
+
+
 # pylint: enable=E1101
 
 
@@ -36,14 +46,6 @@ def get_question_data(x: Questions):
     js = x.as_json
     js["answer"] = x.answer
     return js
-
-
-def get_all_users():
-    return map_to_list(lambda x: x.as_json, query_all(UserTable))
-
-
-def get_all_questions():
-    return map_to_list(get_question_data, query_all(Questions))
 
 
 def is_not_admin(idx: str) -> bool:
@@ -143,7 +145,12 @@ def handler(data: ParsedRequest) -> dict:
         return add_question(data.json)
     if action == "get-latest-question-number":
         q = get_latest_q_level()
-        return {"question_number": q, "question_data": get_ques_by_id(q).as_json}
+        print(q)
+        qid = get_ques_by_id(q)
+        return {
+            "question_number": q,
+            "question_data": qid.as_json if qid is not None else qid,
+        }
     if action == "edit-question":
         return edit_question(data.json)
     if not data.json:
