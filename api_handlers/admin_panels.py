@@ -140,7 +140,8 @@ def handler(data: ParsedRequest) -> dict:
         return {"question_number": q, "question_data": get_ques_by_id(q).as_json}
     if action == "edit-question":
         return edit_question(data.json)
-
+    if not data.json:
+        return {"error": "Invalid"}
     user = get_user_by_id(data.json.get("user"))
     if action == "set-level":
         return set_level(user, data.json.get("level"))
