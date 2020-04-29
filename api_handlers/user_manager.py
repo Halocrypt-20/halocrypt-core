@@ -116,9 +116,21 @@ def edit(js: dict) -> dict:
     return {"error": "not implemented"}
 
 
+def clear_older_tokens(type_, user):
+    older_tokens = EphermalTokenStore.query.filter_by(
+        token_user=user, token_type=type_
+    ).all()
+    for i in older_tokens:
+        delete_from_db(i, True)
+
+
 def forgot_password(js: dict) -> dict:
     user = js.get("user")
-    new_token = EphermalTokenStore("forgot_password", user)
+    if user is None:
+        return {"error": "No"}
+    tx = "forgot_password"
+    clear_older_tokens(tx, user)
+    new_token = EphermalTokenStore(tx, user)
     utable = get_user_by_id(user)
     if not utable:
         return {"error": "User does not exist"}
@@ -154,7 +166,12 @@ def check_password_token(js: dict) -> dict:
 
 def send_verification_email(js: dict) -> dict:
     user = js.get("user")
-    new_token = EphermalTokenStore("email_verify", user)
+    if user is None:
+        return {"error": "no"}
+    tx = "email_verify"
+    clear_older_tokens(tx, user)
+    new_token = EphermalTokenStore(tx, user)
+
     add_to_db(new_token)
     send_email_to_user(
         get_user_by_id(user).email,

@@ -194,11 +194,8 @@ class UserTable(db.Model):
             "last_question_answered_at": self.last_question_answered_at,
             "name": self.name,  # for debug purp
             "has_verified_email": self.has_verified_email,
-            "secure_data": {
-                "email": self.email,
-                "school": self.school,
-                "ig_user_id": self.ig_user_id or None,
-            },
+            "school": self.school,
+            "secure_data": {"email": self.email, "ig_user_id": self.ig_user_id or None},
         }
 
     def __repr__(self):
