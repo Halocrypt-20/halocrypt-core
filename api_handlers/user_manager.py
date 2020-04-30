@@ -120,6 +120,8 @@ def edit(js: dict) -> dict:
         return {"error": "Not Authenticated"}
     user = js.get("user", "").strip()
     field = js.get("field", "").strip()
+    if field not in ["email", "school", "ig_user_id"]:
+        return {"error": "cannot edit specified field"}
     new_value = js.get("new_value", "").strip()
     if user != get_current_user():
         return {"error": "Invalid credentials"}
