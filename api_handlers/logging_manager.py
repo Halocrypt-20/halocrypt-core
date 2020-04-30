@@ -9,6 +9,7 @@ def handler(data: ParsedRequest):
     ip = data.client_ip
     current = get_current_user()
     if action == "1":
+        return {"success": "Ok"}
         js = data.json
         type_ = js.pop("type")
         user = current or None
@@ -16,6 +17,7 @@ def handler(data: ParsedRequest):
         add_to_db(log)
         return {"success": "Ok"}
     if action == "get":
+        return {}
         if current is None:
             return {"error": "Not authenticated"}
         user = get_user_by_id(current)

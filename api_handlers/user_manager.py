@@ -129,11 +129,11 @@ def forgot_password(js: dict) -> dict:
     if user is None:
         return {"error": "No"}
     tx = "forgot_password"
-    clear_older_tokens(tx, user)
-    new_token = EphermalTokenStore(tx, user)
     utable = get_user_by_id(user)
     if not utable:
         return {"error": "User does not exist"}
+    clear_older_tokens(tx, user)
+    new_token = EphermalTokenStore(tx, user)
     add_to_db(new_token)
     send_email_to_user(
         utable.email,
