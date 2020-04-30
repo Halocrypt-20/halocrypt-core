@@ -16,7 +16,12 @@ def add_cookie(data: dict):
 
 def get_host(request):
     get = request.headers.get
-    return get("Origin") or get("Host") or get("x-halocrypt-origin")
+    return (
+        get("Origin")
+        or get("Host")
+        or get("x-halocrypt-origin")
+        or request.form.get("x-halocrypt-origin")
+    )
 
 
 def is_prod(request) -> bool:

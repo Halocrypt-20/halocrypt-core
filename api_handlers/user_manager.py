@@ -13,7 +13,7 @@ from app_init import (
     is_logged_in,
 )
 from constants import BAD_REQUEST, DENIED, IS_LOGGED_IN, NOT_FOUND, USER_ID
-from database import add_to_db, delete_from_db
+from database import add_to_db, delete_from_db, save_to_db
 from util import sanitize, validate_email_address
 
 from .common import get_token_store_by_token, get_user_by_id
@@ -112,8 +112,41 @@ def authenticate(data: dict):
         return {"error": "Wrong password"}, {**DENIED, "cookies": {IS_LOGGED_IN: False}}
 
 
+sentinel = object()
+
+
 def edit(js: dict) -> dict:
-    return {"error": "not implemented"}
+    if not is_logged_in():
+        return {"error": "Not Authenticated"}
+    user = js.get("user", "").strip()
+    field = js.get("field", "").strip()
+    new_value = js.get("new_value", "").strip()
+    if user != get_current_user():
+        return {"error": "Invalid credentials"}
+    invalid_data_arr = []
+    if not user:
+        invalid_data_arr.append("user")
+    if not field:
+        invalid_data_arr.append("column")
+    if not new_value:
+        invalid_data_arr.append("value")
+
+    if invalid_data_arr:
+        return {"error": f"Missing data: {', '.join(invalid_data_arr)}"}
+
+    user_table = get_user_by_id(user)
+
+    attr = getattr(user_table, field, sentinel)
+    if attr == sentinel:
+        return {"error": "Invalid field"}
+    if attr == new_value:
+        # prevent a useless write
+        return {"success": True}
+    setattr(user_table, field, new_value)
+    if field == "email":
+        user_table.has_verified_email = False
+    save_to_db()
+    return {"user_data": user_table.as_json}
 
 
 def clear_older_tokens(type_, user):
