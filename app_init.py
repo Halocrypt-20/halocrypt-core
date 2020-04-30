@@ -320,10 +320,15 @@ class ParsedRequest:
     def __init__(self, request: request, action: str):
         self.args = dict(request.args)
         self.headers = request.headers
-        self.json: dict = request.get_json()
+        self.json: dict = dict(request.form)
         self.action = action or ""
         self.client_ip = get_client_ip(request.headers, request.remote_addr)
         self.method = request.method
+        self.origin = (
+            self.json.pop("x-halocrypt-origin")
+            if "x-halocrypt-origin" in self.json
+            else None
+        )
 
     @property
     def as_json(self):
