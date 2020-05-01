@@ -173,7 +173,7 @@ def forgot_password(js: dict) -> dict:
     send_email_to_user(
         utable.email,
         "Reset Password - Halocrypt",
-        f"Your one time password reset token is - {new_token.token_string}",
+        f"Your one time password reset token is - {new_token.token_string} \nToken Expires in 3 hours",
     )
     return {"success": "Email Sent"}
 
@@ -211,7 +211,7 @@ def send_verification_email(js: dict) -> dict:
     send_email_to_user(
         get_user_by_id(user).email,
         "Verify Email address - Halocrypt",
-        f"Your Verification Code is - {new_token.token_string}",
+        f"Your Verification Code is - {new_token.token_string} \nToken Expires in 3 hours",
     )
     return {"success": "Email Sent"}
 
