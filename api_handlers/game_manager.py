@@ -23,12 +23,15 @@ def clean_node(a):
     return x
 
 
-def generate_leaderboard():
+LEADERBOARD_LIMIT = 100
+
+
+def generate_leaderboard(offset=0):
     all_users: List[UserTable] = UserTable.query.order_by(
         UserTable.is_admin.asc(),
         UserTable.current_level.desc(),
         UserTable.last_question_answered_at.asc(),
-    ).all()
+    ).offset(offset).limit(LEADERBOARD_LIMIT).all()
     return map_to_list(clean_node, all_users)
 
 

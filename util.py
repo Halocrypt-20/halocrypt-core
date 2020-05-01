@@ -20,9 +20,9 @@ def get_host(request):
     orig = form.get("x-halocrypt-origin")
     return (
         orig
-        or request.args.get("crs", "")
         or get("Origin")
         or get("x-halocrypt-origin")
+        or request.args.get("crs", "localhost")
     )
 
 

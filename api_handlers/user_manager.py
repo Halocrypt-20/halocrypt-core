@@ -13,7 +13,7 @@ from app_init import (
     is_logged_in,
 )
 from constants import BAD_REQUEST, DENIED, IS_LOGGED_IN, NOT_FOUND, USER_ID
-from database import add_to_db, delete_from_db, save_to_db
+from database import add_to_db, delete_from_db, save_to_db, get_table_size
 from util import sanitize, validate_email_address
 
 from .common import get_token_store_by_token, get_user_by_id
@@ -110,6 +110,10 @@ def authenticate(data: dict):
         )
     else:
         return {"error": "Wrong password"}, {**DENIED, "cookies": {IS_LOGGED_IN: False}}
+
+
+def get_user_num():
+    return get_table_size(UserTable.user)
 
 
 sentinel = object()
@@ -261,6 +265,8 @@ def handler(data: ParsedRequest):
         return send_verification_email(data.json)
     if action == "check-email-token":
         return check_email_token(data.json)
+    if action == "user-count":
+        return {"count": get_user_num()}
     if action == "check-auth":
         logged_in = is_logged_in()
         user_details = None
