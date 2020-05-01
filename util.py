@@ -18,7 +18,12 @@ def get_host(request):
     get = request.headers.get
     form = request.form or {}
     orig = form.get("x-halocrypt-origin")
-    return get("Origin") or get("x-halocrypt-origin") or orig or request.args.get("crs")
+    return (
+        orig
+        or request.args.get("crs", "")
+        or get("Origin")
+        or get("x-halocrypt-origin")
+    )
 
 
 def is_prod(request) -> bool:

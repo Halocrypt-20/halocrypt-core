@@ -318,17 +318,14 @@ class Logs(db.Model):
 # Custom request parser
 class ParsedRequest:
     def __init__(self, request: request, action: str):
+        payload = request.form.get("__payload")
         self.args = dict(request.args)
         self.headers = request.headers
-        self.json: dict = dict(request.form)
+        self.json: dict = loads(payload) if payload is not None else {}
         self.action = action or ""
         self.client_ip = get_client_ip(request.headers, request.remote_addr)
         self.method = request.method
-        self.origin = (
-            self.json.pop("x-halocrypt-origin")
-            if "x-halocrypt-origin" in self.json
-            else None
-        )
+        self.origin = request.form.get("x-halocrypt-origin")
 
     @property
     def as_json(self):

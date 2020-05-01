@@ -3,7 +3,7 @@ from flask import Flask, request, send_from_directory
 from app_init import app, json_response, ParsedRequest, clear_data, get_session
 from api_handlers import get_handler
 from util import get_client_ip
-from api_handlers.email_manager import send_email_to_user 
+from api_handlers.email_manager import send_email_to_user
 
 # Favicon
 @app.route("/favicon.ico")
