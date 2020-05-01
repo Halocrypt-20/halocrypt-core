@@ -144,11 +144,18 @@ def edit(js: dict) -> dict:
     if attr == new_value:
         # prevent a useless write
         return {"success": True}
-    setattr(user_table, field, new_value)
-    if field == "email":
-        user_table.has_verified_email = False
-    save_to_db()
-    return {"user_data": user_table.as_json}
+    try:
+        setattr(user_table, field, new_value)
+        if field == "email":
+            user_table.has_verified_email = False
+        save_to_db()
+        return {"user_data": user_table.as_json}
+    except:
+        return {
+            "error": "Could not update"
+            if field != "email"
+            else "Could not update email, maybe another account is using that address"
+        }
 
 
 def clear_older_tokens(type_, user):
