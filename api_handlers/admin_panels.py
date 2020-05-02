@@ -10,7 +10,7 @@ from app_init import (
 )
 from constants import DENIED, SUCCESS
 from database import delete_from_db, query_all, save_to_db, add_to_db
-from util import map_to_list, safe_int
+from util import map_to_list, safe_int, validate_email_address
 from sqlalchemy import func
 from .common import get_user_by_id, get_ques_by_id
 from .user_manager import add_user
@@ -64,6 +64,13 @@ def set_level(user: UserTable, level_to_set):
     return SUCCESS
 
 
+def set_last_question_answered_at(user: UserTable, tstamp):
+    ts = safe_int(tstamp)
+    user.last_question_answered_at = ts
+    save_to_db()
+    return SUCCESS
+
+
 def delete_user(user: UserTable):
     delete_from_db(user)
     return SUCCESS
@@ -72,13 +79,13 @@ def delete_user(user: UserTable):
 def disqualify(user: UserTable):
     user.is_disqualified = True
     save_to_db()
-    return SUCCESS
+    return {"user_data": user.as_json}
 
 
 def requalify(user: UserTable):
     user.is_disqualified = False
     save_to_db()
-    return SUCCESS
+    return {"user_data": user.as_json}
 
 
 def create_admin_account(data: ParsedRequest):
@@ -130,12 +137,44 @@ def convert_to_admin_account(js: dict) -> dict:
     return u.as_json
 
 
+sentinel = object()
+
+
+def admin_edit_user(utable, js):
+    field = js.get("field", "").strip()
+    new_value = js.get("new_value", "").strip()
+    prev_value = getattr(utable, field, sentinel)
+    if prev_value == sentinel:
+        return {"error": "??????"}
+
+    if prev_value == new_value:
+        return {"user_data": utable.as_json}
+    if field == "current_level":
+        set_level(utable, new_value)
+        return {"user_data": utable.as_json}
+    elif field == "last_question_answered_at":
+        set_last_question_answered_at(utable, new_value)
+        return {"user_data": utable.as_json}
+    elif field == "email":
+        if not validate_email_address(new_value):
+            return {"error": "Invalid email"}
+        utable.has_verified_email = False
+    try:
+        setattr(utable, field, new_value)
+        save_to_db()
+        return {"user_data": utable.as_json}
+    except Exception:
+        return {
+            "error": "Could not update"
+            if field != "email"
+            else "Could not update email, maybe another account is using that address"
+        }
+
+
 def handler(data: ParsedRequest) -> dict:
     action = data.action
     if action == "create-admin-account":
         return create_admin_account(data)
-    if action == "elevate-status":
-        return convert_to_admin_account(data.json)
     curr = get_current_user()
     if not curr or is_not_admin(curr):
         return (
@@ -150,7 +189,6 @@ def handler(data: ParsedRequest) -> dict:
         return add_question(data.json)
     if action == "get-latest-question-number":
         q = get_latest_q_level()
-        print(q)
         qid = get_ques_by_id(q)
         return {
             "question_number": q,
@@ -160,9 +198,11 @@ def handler(data: ParsedRequest) -> dict:
         return edit_question(data.json)
     if not data.json:
         return {"error": "Invalid"}
+    # if action == "elevate-status":
+    #     return convert_to_admin_account(data.json)
     user = get_user_by_id(data.json.get("user"))
-    if action == "set-level":
-        return set_level(user, data.json.get("level"))
+    if action == "__edit__":
+        return admin_edit_user(user, data.json)
     if action == "delete-user":
         return delete_user(user)
     if action == "disqualify":

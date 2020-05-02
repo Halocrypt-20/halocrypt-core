@@ -147,10 +147,12 @@ def edit(js: dict) -> dict:
         return {"error": "Invalid field"}
     if attr == new_value:
         # prevent a useless write
-        return {"success": True}
+        return {"user_data": user_table.as_json}
     try:
         setattr(user_table, field, new_value)
         if field == "email":
+            if not validate_email_address(new_value):
+                return {"error": "Invalid email"}
             user_table.has_verified_email = False
         save_to_db()
         return {"user_data": user_table.as_json}
