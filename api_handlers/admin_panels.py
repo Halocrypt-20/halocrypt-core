@@ -15,6 +15,10 @@ from sqlalchemy import func
 from .common import get_user_by_id, get_ques_by_id
 from .user_manager import add_user
 from json import dumps
+from response_caching import cache
+from os import getpid
+
+pid = getpid()
 
 ADMIN_TOKEN_OS = environ.get("ADMIN_TOKEN")
 # pylint: disable=E1101
@@ -35,6 +39,7 @@ def get_all_questions():
     )
 
 
+@cache(lambda: f"{pid}_user_cache.admin")
 def get_all_users():
     return map_to_list(lambda x: x.as_json, query_all(UserTable))
 
@@ -104,7 +109,7 @@ def add_question(js: dict) -> dict:
 def edit_question(js: dict) -> dict:
     num: int = js.get("question_level")
     qs = get_ques_by_id(num)
-    qs.question = js.get("question", qs.question)
+    qs.question = dumps(js.get("question", qs.question))
     qs.answer = js.get("answer", qs.answer)
     qs.hint = dumps(js.get("hint", qs.hint))
     qs.special = dumps(js.get("special", qs.special))

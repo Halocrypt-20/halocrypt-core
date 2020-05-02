@@ -7,7 +7,10 @@ from constants import BAD_REQUEST, DENIED, NOT_FOUND
 from database import query_all, save_to_db
 from util import map_to_list, safe_int, sanitize, js_time
 from .common import get_ques_by_id, get_user_by_id
+from response_caching import cache
+from os import getpid
 
+pid = getpid()
 replace = _compile(r"\s").sub
 
 no_question = lambda idx: {"game_over": True}
@@ -23,15 +26,16 @@ def clean_node(a):
     return x
 
 
-LEADERBOARD_LIMIT = 100
+# LEADERBOARD_LIMIT = 100
 
 
-def generate_leaderboard(offset=0):
+@cache(lambda: f"{pid}_leaderboard_temp_cache")
+def generate_leaderboard():
     all_users: List[UserTable] = UserTable.query.order_by(
         UserTable.is_admin.asc(),
         UserTable.current_level.desc(),
         UserTable.last_question_answered_at.asc(),
-    ).offset(offset).limit(LEADERBOARD_LIMIT).all()
+    ).all()
     return map_to_list(clean_node, all_users)
 
 
@@ -83,7 +87,8 @@ def handler(data: ParsedRequest) -> dict:
             return {"error": "You are logged out"}, DENIED
 
         user_data: UserTable = get_user_by_id(user_id)
-
+        if user_data.is_disqualified:
+            return {"error": "Disqualified"}
         return answer_question(
             user_data.current_level, data.json.get("answer"), user_data
         )

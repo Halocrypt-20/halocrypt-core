@@ -245,7 +245,7 @@ class Questions(db.Model):
         special: str = "",
     ):
         self.question_level = question_level
-        self.question = question
+        self.question = dumps(question)
         self.answer = answer
         self.hint = dumps(hint)
         self.special = dumps(special)
@@ -254,7 +254,7 @@ class Questions(db.Model):
     def as_json(self):
         return {
             "question_level": self.question_level,
-            "question": self.question,
+            "question": loads(self.question),
             "hint": loads(self.hint),
             "special": loads(self.special),
         }
