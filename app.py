@@ -17,7 +17,7 @@ kwargs = dict(strict_slashes=False, methods=["post", "get"])
 @app.route("/<route>/", **kwargs)
 @app.route("/<route>/<action>/", **kwargs)
 @app.route("/")
-def index():
+def index(route=None):
     return send_from_directory("docs", "index.html")
 
 
