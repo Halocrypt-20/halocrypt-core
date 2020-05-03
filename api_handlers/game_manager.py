@@ -37,8 +37,7 @@ no_question = lambda idx: {"game_over": True}
 
 
 @run_in_thread
-def post_level_up_webhook(user: UserTable):
-    js = f"{user.user} progressed to level {user.current_level}"
+def post_level_up_webhook(js):
     requests.post(webhook_url, json={"content": js})
 
 
@@ -84,10 +83,11 @@ def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
         return no_question(question_number)
     correct = replace("", question.answer)
     current = replace("", answer)
+    js = f"{user.user} tried to answer {user.current_level} with {current}  (correct answer - {correct})"
+    post_level_up_webhook(js)
     if correct == current:  # no
         user.current_level = user.current_level + 1  # +=1 yeah
         user.last_question_answered_at = js_time()
-        post_level_up_webhook(user)
         save_to_db()
 
         return {"result": True, "next_level": user.current_level}
