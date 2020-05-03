@@ -14,7 +14,6 @@ from util import js_time, map_to_list, safe_int, sanitize
 from .common import get_ques_by_id, get_user_by_id, post_level_up_webhook
 
 
-
 pid = "halocrypt"  # getpid()
 replace = _compile(r"\s").sub
 
@@ -68,7 +67,7 @@ def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
     correct = replace("", question.answer)
     current = replace("", answer)
     is_correct = correct == current
-    js = f"{user.user} tried to answer {user.current_level} with {current}  ({'✅' if is_correct else '❌'})"
+    js = f"{user.user} ({user.school}) tried to answer {user.current_level} with {current}  ({'✅' if is_correct else '❌'})"
     post_level_up_webhook(js)
     if is_correct:  # no
         user.current_level = user.current_level + 1  # +=1 yeah
