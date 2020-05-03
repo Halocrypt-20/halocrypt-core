@@ -67,8 +67,9 @@ def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
     correct = replace("", question.answer)
     current = replace("", answer)
     is_correct = correct == current
-    js = f"{user.user} ({user.school}) tried to answer {user.current_level} with {current}  ({'✅' if is_correct else '❌'})"
-    post_level_up_webhook(js)
+    if is_correct:
+        js = f"{user.user} ({user.school}) tried to answer {user.current_level} with {current}  ({'✅' if is_correct else '❌'})"
+        post_level_up_webhook(js)
     if is_correct:  # no
         user.current_level = user.current_level + 1  # +=1 yeah
         user.last_question_answered_at = js_time()
