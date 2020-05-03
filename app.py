@@ -14,7 +14,12 @@ def favicon():
 # setup redirect to frontend?
 @app.route("/")
 def index():
-    return json_response({"hello": "world"})
+    return send_from_directory("docs", "index.html")
+
+
+@app.route("/docs/<path:asset>")
+def file_send(asset):
+    return send_from_directory("docs", asset)
 
 
 @app.route("/_/ip")
