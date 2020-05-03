@@ -11,7 +11,12 @@ from database import query_all, save_to_db
 from response_caching import cache
 from util import js_time, map_to_list, safe_int, sanitize
 
-from .common import get_ques_by_id, get_user_by_id, post_level_up_webhook,post_incorrect_webhook
+from .common import (
+    get_ques_by_id,
+    get_user_by_id,
+    post_level_up_webhook,
+    post_incorrect_webhook,
+)
 
 
 pid = "halocrypt"  # getpid()
@@ -36,6 +41,7 @@ def clean_node(a):
 @cache(lambda: f"{pid}_leaderboard_temp_cache")
 def generate_leaderboard():
     all_users: List[UserTable] = UserTable.query.order_by(
+        UserTable.is_disqualified.asc(),
         UserTable.is_admin.asc(),
         UserTable.current_level.desc(),
         UserTable.last_question_answered_at.asc(),
