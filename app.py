@@ -12,6 +12,8 @@ def favicon():
 
 
 # setup redirect to frontend?
+@app.route("/<route>/", **kwargs)
+@app.route("/<route>/<action>/", **kwargs)
 @app.route("/")
 def index():
     return send_from_directory("docs", "index.html")
@@ -41,8 +43,7 @@ def handle_logout():
 kwargs = dict(strict_slashes=False, methods=["post", "get"])
 
 
-@app.route("/<route>/", **kwargs)
-@app.route("/<route>/<action>/", **kwargs)
+
 @app.route("/api/<route>/", **kwargs)
 @app.route("/api/<route>/<action>/", **kwargs)
 def handle_api_call(route, action=None):
