@@ -22,7 +22,8 @@ def get_host(request):
         orig
         or get("Origin")
         or get("x-halocrypt-origin")
-        or request.args.get("crs", "localhost")
+        or get("Host")
+        or request.args.get("crs", "")
     )
 
 
