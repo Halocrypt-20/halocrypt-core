@@ -1,9 +1,8 @@
 from os import environ
 from re import compile as _compile
-from threading import Thread
 from typing import List
 
-import requests
+
 from flask import request
 
 from app_init import ParsedRequest, Questions, UserTable, get_current_user
@@ -12,18 +11,8 @@ from database import query_all, save_to_db
 from response_caching import cache
 from util import js_time, map_to_list, safe_int, sanitize
 
-from .common import get_ques_by_id, get_user_by_id
+from .common import get_ques_by_id, get_user_by_id, post_level_up_webhook
 
-webhook_url = environ.get("USER_ACTION_WEBHOOK")
-
-
-def run_in_thread(fn):
-    def run(*k, **kw):
-        t = Thread(target=fn, args=k, kwargs=kw)
-        t.start()
-        return t
-
-    return run
 
 
 pid = "halocrypt"  # getpid()
@@ -34,11 +23,6 @@ no_question = lambda idx: {"game_over": True}
 #     #     {"error": f"No Questions Available for id - {idx}"},
 #     #     NOT_FOUND,
 # )
-
-
-@run_in_thread
-def post_level_up_webhook(js):
-    requests.post(webhook_url, json={"content": js})
 
 
 def clean_node(a):
