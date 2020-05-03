@@ -1,16 +1,32 @@
+from os import environ
+from re import compile as _compile
+from threading import Thread
 from typing import List
 
+import requests
 from flask import request
-from re import compile as _compile
+
 from app_init import ParsedRequest, Questions, UserTable, get_current_user
 from constants import BAD_REQUEST, DENIED, NOT_FOUND
 from database import query_all, save_to_db
-from util import map_to_list, safe_int, sanitize, js_time
-from .common import get_ques_by_id, get_user_by_id
 from response_caching import cache
-from os import getpid
+from util import js_time, map_to_list, safe_int, sanitize
 
-pid = getpid()
+from .common import get_ques_by_id, get_user_by_id
+
+webhook_url = environ.get("USER_ACTION_WEBHOOK")
+
+
+def run_in_thread(fn):
+    def run(*k, **kw):
+        t = Thread(target=fn, args=k, kwargs=kw)
+        t.start()
+        return t
+
+    return run
+
+
+pid = "halocrypt"  # getpid()
 replace = _compile(r"\s").sub
 
 no_question = lambda idx: {"game_over": True}
@@ -18,6 +34,12 @@ no_question = lambda idx: {"game_over": True}
 #     #     {"error": f"No Questions Available for id - {idx}"},
 #     #     NOT_FOUND,
 # )
+
+
+@run_in_thread
+def post_level_up_webhook(user: UserTable):
+    js = f"{user.user} progressed to level {user.current_level}"
+    requests.post(webhook_url, json={"content": js})
 
 
 def clean_node(a):
@@ -65,7 +87,9 @@ def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
     if correct == current:  # no
         user.current_level = user.current_level + 1  # +=1 yeah
         user.last_question_answered_at = js_time()
+        post_level_up_webhook(user)
         save_to_db()
+
         return {"result": True, "next_level": user.current_level}
     else:
         return incorrect_answer

@@ -102,7 +102,9 @@ def create_admin_account(data: ParsedRequest):
 
 def add_question(js: dict) -> dict:
     q_level: int = get_next_q_level()
-    question: str = js.get("question", "").strip()
+    question_dict: dict = js.get("question", {})
+    question = question_dict.get("value", "").strip()
+    question_dict["value"] = question
     hint: str = js.get("hint")
     answer: str = js.get("answer", "").strip()
     spec_data: dict = js.get("special")
