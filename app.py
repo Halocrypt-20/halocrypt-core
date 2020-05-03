@@ -11,6 +11,8 @@ def favicon():
     return send_from_directory("static", "favicon.ico")
 
 
+kwargs = dict(strict_slashes=False, methods=["post", "get"])
+
 # setup redirect to frontend?
 @app.route("/<route>/", **kwargs)
 @app.route("/<route>/<action>/", **kwargs)
@@ -38,10 +40,6 @@ def ip_addr():
 @app.route("/api/logout/", strict_slashes=False, methods=["post"])
 def handle_logout():
     return clear_data()
-
-
-kwargs = dict(strict_slashes=False, methods=["post", "get"])
-
 
 
 @app.route("/api/<route>/", **kwargs)
