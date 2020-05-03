@@ -93,16 +93,17 @@ def clear_data():
 
 @app.before_request
 def enforce_https():
-    hs = get_host(request)
-    if (
-        not request.is_secure
-        and not "127.0.0.1" in hs
-        and not "localhost" in hs
-        and request.url.startswith("http://")
-    ):
-        rd = request.url.replace("http://", "https://")
-        return redirect(rd, code=301)
-    return check_rate_limit(request)
+    return None
+    # hs = get_host(request)
+    # if (
+    #     not request.is_secure
+    #     and not "127.0.0.1" in hs
+    #     and not "localhost" in hs
+    #     and request.url.startswith("http://")
+    # ):
+    #     rd = request.url.replace("http://", "https://")
+    #     return redirect(rd, code=301)
+    # return check_rate_limit(request)
 
 
 # make sure our responses are only API calls
