@@ -273,5 +273,8 @@ def handler(data: ParsedRequest):
         logged_in = is_logged_in()
         user_details = None
         if logged_in:
-            user_details = get_user_by_id(get_current_user()).as_json
+            user_details = get_user_by_id(get_current_user())
+            if not user_details:
+                return {"is_logged_in": False}
+            user_details = user_details.as_json
         return {"is_logged_in": bool(logged_in), "user_data": user_details}

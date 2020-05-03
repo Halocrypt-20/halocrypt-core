@@ -98,12 +98,17 @@ def handler(data: ParsedRequest) -> dict:
             return get_question(0)  # by default
         else:
             user_data: UserTable = get_user_by_id(user_id)
+            if not user_data:
+                return {"error": "Deleted.."}
             return get_question(user_data.current_level)
+
     if action == "answer-question" or action == "answer":
         if not user_id:
             return {"error": "You are logged out"}, DENIED
 
         user_data: UserTable = get_user_by_id(user_id)
+        if not user_data:
+            return {"error": "Deleted"}
         if user_data.is_disqualified:
             return {"error": "Disqualified"}
         return answer_question(
