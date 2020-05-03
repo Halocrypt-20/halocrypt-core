@@ -5,7 +5,7 @@ from threading import Thread
 from os import environ
 
 webhook_url = environ.get("USER_ACTION_WEBHOOK")
-
+incorrect_ = environ.get("INCORRECT_ANSWER")
 lower = _func.lower
 
 
@@ -21,6 +21,11 @@ def run_in_thread(fn):
 @run_in_thread
 def post_level_up_webhook(js):
     requests.post(webhook_url, json={"content": js})
+
+
+@run_in_thread
+def post_incorrect_webhook(js):
+    requests.post(incorrect_, json={"content": js})
 
 
 def get_ques_by_id(idx: str) -> Questions:

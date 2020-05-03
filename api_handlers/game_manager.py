@@ -11,7 +11,7 @@ from database import query_all, save_to_db
 from response_caching import cache
 from util import js_time, map_to_list, safe_int, sanitize
 
-from .common import get_ques_by_id, get_user_by_id, post_level_up_webhook
+from .common import get_ques_by_id, get_user_by_id, post_level_up_webhook,post_incorrect_webhook
 
 
 pid = "halocrypt"  # getpid()
@@ -67,9 +67,11 @@ def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
     correct = replace("", question.answer)
     current = replace("", answer)
     is_correct = correct == current
+    js = f"{user.user} ({user.school}) tried to answer {user.current_level} with {current}  ({'✅' if is_correct else '❌'})"
     if is_correct:
-        js = f"{user.user} ({user.school}) tried to answer {user.current_level} with {current}  ({'✅' if is_correct else '❌'})"
         post_level_up_webhook(js)
+    else:
+        post_incorrect_webhook(js)
     if is_correct:  # no
         user.current_level = user.current_level + 1  # +=1 yeah
         user.last_question_answered_at = js_time()
