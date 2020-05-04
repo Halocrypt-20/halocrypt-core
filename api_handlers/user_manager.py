@@ -42,6 +42,7 @@ def get_user_details(
     is_admin = False
     if curr:
         is_admin = get_user_by_id(curr)
+        is_admin = is_admin.is_admin if is_admin else False
     if data:
         ret = data.as_json
         if is_admin or (data.user == curr and get_authenticated_data):
