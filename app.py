@@ -1,4 +1,4 @@
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_from_directory, Response
 
 from app_init import app, json_response, ParsedRequest, clear_data, get_session
 from api_handlers import get_handler
@@ -18,7 +18,7 @@ kwargs = dict(strict_slashes=False, methods=["post", "get"])
 @app.route("/<route>/<action>/", **kwargs)
 @app.route("/")
 def index(route=None, action=None):
-    return send_from_directory("docs", "index.html")
+    return send_from_directory("docs", "index.html", cache_timeout=0)
 
 
 @app.route("/docs/<path:asset>")
