@@ -16,6 +16,7 @@ from .common import (
     get_user_by_id,
     post_level_up_webhook,
     post_incorrect_webhook,
+    save_log_to_file_system,
 )
 
 
@@ -23,10 +24,6 @@ pid = "halocrypt"  # getpid()
 replace = _compile(r"\s").sub
 
 no_question = lambda idx: {"game_over": True}
-# (
-#     #     {"error": f"No Questions Available for id - {idx}"},
-#     #     NOT_FOUND,
-# )
 
 
 def clean_node(a):
@@ -76,6 +73,15 @@ def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
     current = replace("", answer)
     is_correct = correct == current
     js = f"{user.user} ({user.school}) tried to answer {user.current_level} with {current}  ({'✅' if is_correct else '❌'})"
+    save_log_to_file_system(
+        {
+            "user": user.user,
+            "school": user.school,
+            "attempt": current,
+            "is_correct": is_correct,
+            "timestamp": js_time(),
+        }
+    )
     if is_correct:
         post_level_up_webhook(js)
     else:

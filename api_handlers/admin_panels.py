@@ -12,7 +12,13 @@ from constants import DENIED, SUCCESS
 from database import delete_from_db, query_all, save_to_db, add_to_db
 from util import map_to_list, safe_int, validate_email_address
 from sqlalchemy import func
-from .common import get_user_by_id, get_ques_by_id, post_level_up_webhook
+from .common import (
+    get_user_by_id,
+    get_ques_by_id,
+    post_level_up_webhook,
+    get_log_from_file_system,
+    clean_logs,
+)
 from .user_manager import add_user
 from json import dumps
 from response_caching import cache
@@ -183,6 +189,11 @@ def handler(data: ParsedRequest) -> dict:
             {"error": "You do not have the permissions to access this content"},
             DENIED,
         )
+    if action == "get-logs":
+        return get_log_from_file_system()
+    if action == "clear-logs":
+        clean_logs()
+        return None
     if action == "get-users":
         return get_all_users()
     if action == "get-questions":
@@ -203,7 +214,9 @@ def handler(data: ParsedRequest) -> dict:
     # if action == "elevate-status":
     #     return convert_to_admin_account(data.json)
     user = get_user_by_id(data.json.get("user"))
-    post_level_up_webhook(f"'{curr}' performed an admin action ({action} on {user.user})")
+    post_level_up_webhook(
+        f"'{curr}' performed an admin action ({action} on {user.user})"
+    )
     if action == "__edit__":
         return admin_edit_user(user, data.json)
     if action == "delete-user":

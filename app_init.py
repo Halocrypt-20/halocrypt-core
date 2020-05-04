@@ -2,7 +2,7 @@ from enum import Enum
 from json import dumps, loads
 from os import environ
 from secrets import token_hex
-
+from os.path import join
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, Response, request, session, redirect
 from flask.sessions import SecureCookieSessionInterface
@@ -23,6 +23,7 @@ from rate_limit_manager import check_rate_limit
 
 setup_env()
 
+LOG_FILE_NAME = join("@cache", "__logs__.json")
 app = Flask(__name__)
 app.secret_key = environ.get("secret-key", token_hex(10))
 
