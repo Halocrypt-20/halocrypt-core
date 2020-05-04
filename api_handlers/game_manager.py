@@ -57,7 +57,9 @@ def get_question(idx: str) -> dict:
     ques: Questions = get_ques_by_id(idx)
     if not ques:
         return no_question(idx)
-    return {**ques.as_json, "game_over": False}
+    q = ques.as_json
+    q.pop("special")
+    return {**q, "game_over": False}
 
 
 incorrect_answer = {"result": False}
