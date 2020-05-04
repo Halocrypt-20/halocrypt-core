@@ -91,9 +91,14 @@ def clear_data():
     return resp
 
 
+from urllib.parse import urlparse
+
+
 @app.before_request
 def enforce_https():
-    return None
+    ps = urlparse(request.url)
+    if "herokuapp" in ps.hostname:
+        return redirect("https://halocrypt.com", 302)
     # hs = get_host(request)
     # if (
     #     not request.is_secure
