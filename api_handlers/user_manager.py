@@ -38,10 +38,13 @@ def get_user_details(
     data: UserTable = get_user_by_id(idx)
     if get_authenticated_data and get_class_instance:
         return data
-
+    curr = get_current_user()
+    is_admin = False
+    if curr:
+        is_admin = get_user_by_id(curr)
     if data:
         ret = data.as_json
-        if data.user == get_current_user() and get_authenticated_data:
+        if is_admin or (data.user == curr and get_authenticated_data):
             return ret
         else:
             ret.pop("secure_data")
