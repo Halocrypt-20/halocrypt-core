@@ -98,7 +98,7 @@ from urllib.parse import urlparse
 def enforce_https():
     ps = urlparse(request.url)
     if "herokuapp" in ps.hostname:
-        return redirect("https://halocrypt.com", 302)
+        return redirect("https://halocrypt.com", 301)
     # hs = get_host(request)
     # if (
     #     not request.is_secure
