@@ -1,8 +1,8 @@
 from enum import Enum
 from json import dumps, loads
-from os import environ
+from os import environ, mkdir
 from secrets import token_hex
-from os.path import join
+from os.path import join, isdir
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, Response, request, session, redirect
 from flask.sessions import SecureCookieSessionInterface
@@ -22,6 +22,9 @@ from util import (
 from rate_limit_manager import check_rate_limit
 
 setup_env()
+
+if not isdir("@cache"):
+    mkdir("@cache")
 
 LOG_FILE_NAME = join("@cache", "__logs__.json")
 LOCK_FILE = join("@cache", ".lock.logger")
