@@ -69,6 +69,8 @@ def delete_lockfile():
     remove(LOCK_FILE)
 
 
+# different from response caching, uses lockfile as we can afford 100ms delay as we're not sending
+# any response anyway
 def open_and_write(file, data):
     while isfile(LOCK_FILE):
         sleep(0.1)
@@ -79,7 +81,10 @@ def open_and_write(file, data):
 
 
 def get_log_from_file_system():
-    return open_and_read(filename) or []
+    file = open_and_read(filename) or []
+    if file:
+        file.sort(key=lambda x: x.get("timestamp"), reverse=True)
+    return file
 
 
 sentinel = object()
@@ -95,3 +100,13 @@ def save_log_to_file_system(js):
 
 def clean_logs():
     open_and_write(filename, sentinel)
+
+
+def merge_logs(js):
+    # do not use get_logs_from_file_system to prevent
+    # useless sorting
+    dx = open_and_read(filename) or []
+    for i in js:
+        if i not in dx:
+            dx.append(i)
+    open_and_write(filename, list(dx))

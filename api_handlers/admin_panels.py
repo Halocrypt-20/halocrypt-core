@@ -18,6 +18,7 @@ from .common import (
     post_level_up_webhook,
     get_log_from_file_system,
     clean_logs,
+    merge_logs,
 )
 from .user_manager import add_user
 from json import dumps
@@ -194,6 +195,9 @@ def handler(data: ParsedRequest) -> dict:
     if action == "clear-logs":
         clean_logs()
         return None
+    if action == "merge-logs":
+        merge_logs(data.json)
+        return SUCCESS
     if action == "get-users":
         return get_all_users()
     if action == "get-questions":
