@@ -52,10 +52,12 @@ def get_token_store_by_token(token: str) -> EphermalTokenStore:
 
 
 def open_and_read(file):
+    wait_for_lock_file()
     if not isfile(file):
         return None
     with open(file) as f:
         dx = f.read().strip()
+        delete_lockfile()
         if dx:
             return loads(dx)
         return None
@@ -69,12 +71,17 @@ def delete_lockfile():
     remove(LOCK_FILE)
 
 
-# different from response caching, uses lockfile as we can afford 100ms delay as we're not sending
-# any response anyway
-def open_and_write(file, data):
+def wait_for_lock_file():
     while isfile(LOCK_FILE):
         sleep(0.1)
     touch_lockfile()  #
+    return
+
+
+# different from response caching, uses lockfile as we can afford 100ms delay as we're not sending
+# any response anyway
+def open_and_write(file, data):
+    wait_for_lock_file()
     with open(file, "w") as f:
         f.write(dumps(data))
     delete_lockfile()
@@ -99,12 +106,19 @@ def save_log_to_file_system(js):
 
 
 def clean_logs():
-    open_and_write(filename, sentinel)
+    return
+
+
+#  open_and_write(filename, sentinel)
 
 
 def merge_logs(js):
     # do not use get_logs_from_file_system to prevent
     # useless sorting
+    if "data" in js:
+        js = js.get("data")
+    if not js:
+        return
     dx = open_and_read(filename) or []
     for i in js:
         if i not in dx:
