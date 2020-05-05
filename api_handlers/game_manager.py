@@ -80,6 +80,7 @@ def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
             "attempt": current,
             "is_correct": is_correct,
             "timestamp": js_time(),
+            "level": question_number,
         }
     )
     if is_correct:
