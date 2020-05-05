@@ -52,9 +52,9 @@ def get_token_store_by_token(token: str) -> EphermalTokenStore:
 
 
 def open_and_read(file):
-    wait_for_lock_file()
     if not isfile(file):
         return None
+    wait_for_lock_file()
     with open(file) as f:
         dx = f.read().strip()
         delete_lockfile()
