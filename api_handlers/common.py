@@ -1,10 +1,17 @@
 import requests
-from app_init import Questions, UserTable, EphermalTokenStore, LOG_FILE_NAME as filename
+from app_init import (
+    Questions,
+    UserTable,
+    EphermalTokenStore,
+    LOG_FILE_NAME as filename,
+    LOCK_FILE,
+)
 from sqlalchemy import func as _func
 from threading import Thread
 from os import environ, remove
 from json import loads, dumps
 from os.path import isfile
+from time import sleep
 
 webhook_url = environ.get("USER_ACTION_WEBHOOK")
 incorrect_ = environ.get("INCORRECT_ANSWER")
@@ -54,9 +61,21 @@ def open_and_read(file):
         return None
 
 
+def touch_lockfile():
+    open(LOCK_FILE, "w").close()
+
+
+def delete_lockfile():
+    remove(LOCK_FILE)
+
+
 def open_and_write(file, data):
+    while isfile(LOCK_FILE):
+        sleep(0.1)
+    touch_lockfile()  #
     with open(file, "w") as f:
-        return f.write(dumps(data))
+        f.write(dumps(data))
+    delete_lockfile()
 
 
 def get_log_from_file_system():

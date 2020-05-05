@@ -24,6 +24,7 @@ from rate_limit_manager import check_rate_limit
 setup_env()
 
 LOG_FILE_NAME = join("@cache", "__logs__.json")
+LOCK_FILE = join("@cache", ".lock.logger")
 app = Flask(__name__)
 app.secret_key = environ.get("secret-key", token_hex(10))
 
