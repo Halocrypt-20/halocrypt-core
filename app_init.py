@@ -120,6 +120,7 @@ def enforce_https():
 @app.after_request
 def resp_headers(resp):
     # if not is_prod(request):
+    resp.headers["x-too-easy"] = environ.get("x-token-header-data")
     resp.headers["access-control-allow-origin"] = get_host(request)
     # else:
     #     resp.headers["access-control-allow-origin"] = "https://halocrypt.com"
