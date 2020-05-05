@@ -98,7 +98,7 @@ def get_log_from_file_system():
 sentinel = object()
 
 
-@run_in_thread
+
 def save_log_to_file_system(js):
     data = open_and_read(filename) or []
     if js != sentinel:
