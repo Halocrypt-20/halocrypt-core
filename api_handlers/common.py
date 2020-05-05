@@ -120,7 +120,9 @@ def merge_logs(js):
     if not js:
         return
     dx = open_and_read(filename) or []
+    touch_lockfile()
     for i in js:
         if i not in dx:
             dx.append(i)
-    open_and_write(filename, list(dx))
+    delete_lockfile()
+    open_and_write(filename, dx)
