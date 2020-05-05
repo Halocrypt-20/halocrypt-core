@@ -52,14 +52,6 @@ def handle_logout():
     return clear_data()
 
 
-@app.route("/api/admin/get-logs/", strict_slashes=False)
-@nocache
-def handle_logs():
-    user = get_current_user()
-    collect()
-    if user and not is_not_admin(user):
-        return send_from_directory("@cache", "__logs__.json")
-
 
 @app.route("/api/<route>/", **kwargs)
 @app.route("/api/<route>/<action>/", **kwargs)
