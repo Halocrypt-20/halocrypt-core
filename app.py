@@ -1,9 +1,19 @@
 from flask import Flask, request, send_from_directory, Response
 
-from app_init import app, json_response, ParsedRequest, clear_data, get_session
+from app_init import (
+    app,
+    json_response,
+    ParsedRequest,
+    clear_data,
+    get_session,
+    get_current_user,
+)
 from api_handlers import get_handler
 from util import get_client_ip
 from api_handlers.email_manager import send_email_to_user
+from nocache import nocache
+from api_handlers.admin_panels import is_not_admin
+from gc import collect
 
 # Favicon
 @app.route("/favicon.ico")
@@ -40,6 +50,15 @@ def ip_addr():
 @app.route("/api/logout/", strict_slashes=False, methods=["post"])
 def handle_logout():
     return clear_data()
+
+
+@app.route("/api/admin/get-logs/", strict_slashes=False)
+@nocache
+def handle_logs():
+    user = get_current_user()
+    collect()
+    if user and not is_not_admin(user):
+        return send_from_directory("@cache", "__logs__.json")
 
 
 @app.route("/api/<route>/", **kwargs)

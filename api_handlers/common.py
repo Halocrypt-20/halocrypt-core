@@ -12,6 +12,7 @@ from os import environ, remove
 from json import loads, dumps
 from os.path import isfile
 from time import sleep
+from gc import collect
 
 webhook_url = environ.get("USER_ACTION_WEBHOOK")
 incorrect_ = environ.get("INCORRECT_ANSWER")
@@ -126,3 +127,4 @@ def merge_logs(js):
             dx.append(i)
     delete_lockfile()
     open_and_write(filename, dx)
+    collect()

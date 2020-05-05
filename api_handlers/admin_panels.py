@@ -190,11 +190,11 @@ def handler(data: ParsedRequest) -> dict:
             {"error": "You do not have the permissions to access this content"},
             DENIED,
         )
-    if action == "get-logs":
-        return get_log_from_file_system()
-    if action == "clear-logs":
-        clean_logs()
-        return None
+    # if action == "get-logs":
+    #     return get_log_from_file_system()
+    # if action == "clear-logs":
+    #     clean_logs()
+    #     return None
     if action == "merge-logs":
         merge_logs(data.json)
         return SUCCESS
