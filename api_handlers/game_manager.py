@@ -64,6 +64,8 @@ incorrect_answer = {"result": False}
 
 def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
     answer = (answer or "").strip()
+    if len(answer) > 1000:
+        return incorrect_answer
     if not answer:
         return incorrect_answer
     question: Questions = get_ques_by_id(question_number)
