@@ -117,7 +117,7 @@ def add_question(js: dict) -> dict:
     spec_data: dict = js.get("special")
     if not question or not answer:
         return {"error": "Question and answer can't be blank"}
-    entry = Questions(q_level, question, answer, hint, spec_data)
+    entry = Questions(q_level, question_dict, answer, hint, spec_data)
     add_to_db(entry)
     return entry.as_json
 
