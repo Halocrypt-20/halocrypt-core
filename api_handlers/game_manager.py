@@ -92,7 +92,7 @@ def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
         "timestamp": js_time(),
         "level": question_number,
     }
-    js = f"{'✅' if is_correct else '❌'} {user.user} ({user.school}) tried to answer level {user.current_level} with {current}"
+    js = f"{user.user} ({user.school}) tried to answer {user.current_level} with {current}  ({'✅' if is_correct else '❌'})"
     run_threaded_tasks(js, data_dict, is_correct)
     if is_correct:  # no
         user.current_level = user.current_level + 1  # +=1 yeah
