@@ -28,12 +28,10 @@ def run_in_thread(fn):
     return run
 
 
-@run_in_thread
 def post_level_up_webhook(js):
     requests.post(webhook_url, json={"content": js})
 
 
-@run_in_thread
 def post_incorrect_webhook(js):
     requests.post(incorrect_, json={"content": js})
 
@@ -96,7 +94,6 @@ def get_log_from_file_system():
 
 
 sentinel = object()
-
 
 
 def save_log_to_file_system(js):

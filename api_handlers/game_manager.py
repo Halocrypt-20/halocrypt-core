@@ -17,6 +17,7 @@ from .common import (
     post_level_up_webhook,
     post_incorrect_webhook,
     save_log_to_file_system,
+    run_in_thread,
 )
 
 
@@ -62,6 +63,15 @@ def get_question(idx: str) -> dict:
 incorrect_answer = {"result": False}
 
 
+@run_in_thread
+def run_threaded_tasks(js, data_dict, is_correct):
+    save_log_to_file_system(data_dict)
+    if is_correct:
+        post_level_up_webhook(js)
+    else:
+        post_incorrect_webhook(js)
+
+
 def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
     answer = (answer or "").strip()
     if len(answer) > 1000:
@@ -74,21 +84,16 @@ def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
     correct = replace("", question.answer)
     current = replace("", answer)
     is_correct = correct == current
-    js = f"{user.user} ({user.school}) tried to answer {user.current_level} with {current}  ({'✅' if is_correct else '❌'})"
-    save_log_to_file_system(
-        {
-            "user": user.user,
-            "school": user.school,
-            "attempt": current,
-            "is_correct": is_correct,
-            "timestamp": js_time(),
-            "level": question_number,
-        }
-    )
-    if is_correct:
-        post_level_up_webhook(js)
-    else:
-        post_incorrect_webhook(js)
+    data_dict = {
+        "user": user.user,
+        "school": user.school,
+        "attempt": current,
+        "is_correct": is_correct,
+        "timestamp": js_time(),
+        "level": question_number,
+    }
+    js = f"{'✅' if is_correct else '❌'} {user.user} ({user.school}) tried to answer level {user.current_level} with {current}"
+    run_threaded_tasks(js, data_dict, is_correct)
     if is_correct:  # no
         user.current_level = user.current_level + 1  # +=1 yeah
         user.last_question_answered_at = js_time()
