@@ -206,8 +206,11 @@ class UserTable(db.Model):
             "is_disqualified": self.is_disqualified,
             "last_question_answered_at": self.last_question_answered_at,
             "has_verified_email": self.has_verified_email,
-            "school": self.school,
-            "secure_data": {"email": self.email, "ig_user_id": self.ig_user_id or None},
+            "secure_data": {
+                "email": self.email,
+                "ig_user_id": self.ig_user_id or None,
+                "school": self.school,
+            },
         }
 
     def __repr__(self):
