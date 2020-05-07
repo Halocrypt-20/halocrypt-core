@@ -89,7 +89,6 @@ def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
     if question_number > 22:
         data_dict = {
             "user": user.user,
-            "school": user.school,
             "attempt": current,
             "is_correct": is_correct,
             "timestamp": js_time(),
