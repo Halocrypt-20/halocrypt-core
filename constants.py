@@ -5,3 +5,4 @@ NOT_FOUND = {"status": 404}
 DENIED = {"status": 403}
 SUCCESS = {"success": True}
 THREE_HOURS_JS_TIME = 10_800_000
+
