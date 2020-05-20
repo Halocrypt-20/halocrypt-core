@@ -110,7 +110,7 @@ def handler(data: ParsedRequest) -> dict:
     action = data.action
     if action == "get-leaderboard":
         return generate_leaderboard()
-    return {"error":"game over"}
+    # return {"error":"game over"}
     user_id = get_current_user()
     if action == "get-question":
         if not user_id:

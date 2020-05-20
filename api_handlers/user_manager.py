@@ -258,8 +258,8 @@ def handler(data: ParsedRequest):
     if action == "get-user-details":
         return get_user_details(data.args.get("id"), is_logged_in())
     if action == "add-user" or action == "create":
-        return {"umm": "no"}
-        # return add_user(data.json)
+        # return {"umm": "no"}
+        return add_user(data.json)
     if action == "authenticate":
         return authenticate(data.json)
     if action == "edit":
