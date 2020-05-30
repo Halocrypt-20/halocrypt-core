@@ -52,7 +52,6 @@ def handle_logout():
     return clear_data()
 
 
-
 @app.route("/api/<route>/", **kwargs)
 @app.route("/api/<route>/<action>/", **kwargs)
 def handle_api_call(route, action=None):
@@ -71,6 +70,11 @@ def handle_api_call(route, action=None):
         kwargs = data[1]
         data = data[0]
     return json_response({"data": data}, **kwargs)
+
+
+@app.route("/robots.txt")
+def robos():
+    return send_from_directory(".", "robots.txt")
 
 
 if __name__ == "__main__":
