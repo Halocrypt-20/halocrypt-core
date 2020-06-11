@@ -1,3 +1,6 @@
+import os
+
+
 def when_ready(server):
     # touch app-initialized when ready
     try:
@@ -6,7 +9,7 @@ def when_ready(server):
         pass
 
 
-bind = "unix:///tmp/nginx.socket"
+port = f"127.0.0.1:{os.environ.get('PORT')}"
 workers = 4
 threads = 4
 max_requests = 1200
