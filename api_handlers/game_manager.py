@@ -63,14 +63,14 @@ def get_question(idx: str) -> dict:
 incorrect_answer = {"result": False}
 
 
-@run_in_thread
-def run_threaded_tasks(js, data_dict, is_correct):
-    if data_dict is not None:
-        save_log_to_file_system(data_dict)
-    if is_correct:
-        post_level_up_webhook(js)
-    else:
-        post_incorrect_webhook(js)
+# @run_in_thread
+# def run_threaded_tasks(js, data_dict, is_correct):
+#     if data_dict is not None:
+#         save_log_to_file_system(data_dict)
+#     if is_correct:
+#         post_level_up_webhook(js)
+#     else:
+#         post_incorrect_webhook(js)
 
 
 def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
@@ -94,8 +94,8 @@ def answer_question(question_number: int, answer: str, user: UserTable) -> dict:
             "timestamp": js_time(),
             "level": question_number,
         }
-    js = f"{user.user} ({user.school}) tried to answer {user.current_level} with {current}  ({'✅' if is_correct else '❌'})"
-    run_threaded_tasks(js, data_dict, is_correct)
+    # js = f"{user.user} ({user.school}) tried to answer {user.current_level} with {current}  ({'✅' if is_correct else '❌'})"
+    # run_threaded_tasks(js, data_dict, is_correct)
     if is_correct:  # no
         user.current_level = user.current_level + 1  # +=1 yeah
         user.last_question_answered_at = js_time()
