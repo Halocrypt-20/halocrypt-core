@@ -23,9 +23,10 @@ from rate_limit_manager import check_rate_limit
 
 setup_env()
 
-if not isdir("@cache"):
+try:
     mkdir("@cache")
-
+except:
+    pass
 LOG_FILE_NAME = join("@cache", "__logs__.json")
 LOCK_FILE = join("@cache", ".lock.logger")
 app = Flask(__name__)
