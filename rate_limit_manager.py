@@ -2,7 +2,7 @@
 XXX this is a very naive implementation
 This is just placed here to prevent multiple database hits
 
-I think placing such data in the filesystem is a bad idea but our stack has ephermal fs so...
+I think placing such data in the filesystem is a bad idea but our stack has ephemeral fs so...
 We could store this data in the memory however we run this on 4 workers and no shared memory is another headache
 
 If you have anything better than storing and accessing the filesystem.. PR please.
